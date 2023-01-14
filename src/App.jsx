@@ -87,7 +87,7 @@ function App() {
         }}
       ></audio>
       <div className="bg-black/80 backdrop-blur-xl w-screen h-screen fixed top-0 left-0 z-10 text-white">
-        <div className="flex flex-row items-center justify-between p-5  md:px-20 absolute top-0 w-full">
+        <div className="flex flex-row items-center justify-between p-5  md:px-20 absolute top-0 w-full z-[98999]">
           <div>
             <div className="text-lg font-semibold">{track.title}</div>
             <div className="text-xs">{track.artiste}</div>
