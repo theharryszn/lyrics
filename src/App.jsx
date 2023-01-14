@@ -127,7 +127,7 @@ function App() {
           setIsPlaying(false);
           playTrack(
             tracks.filter((trk) => trk.name !== track.name)[
-              Math.floor(Math.random() * tracks.length)
+              Math.floor(Math.random() * tracks.length - 1)
             ]
           );
         }}
