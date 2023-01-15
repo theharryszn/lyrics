@@ -502,8 +502,6 @@ export const tracks = [
         time: "00:33.00",
         line: "I hate a privileged rapper who don't even know what it take",
       },
-      { time: "", line: "" },
-      { time: "", line: "" },
       {
         time: "00:36.30",
         line: "The diamonds, they hit like a rainbow, that's 'cause the necklace a Frank (Purr)",

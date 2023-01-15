@@ -6,6 +6,8 @@ import {
   MicrophoneStage,
   Pause,
   Play,
+  SkipForward,
+  Spinner,
 } from "phosphor-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { tracks } from "./data";
@@ -73,9 +75,12 @@ function App() {
   const translationX = useMotionValue(window.innerWidth);
   const [currentIndex, setCurrentIndex] = useState(-1);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [loading, setIsLoading] = useState(false);
   const [track, setTrack] = useState(
     tracks[Math.floor(Math.random() * tracks.length)]
   );
+  // using this as a random id for songs
+  const [randomNumber, setRandomNumber] = useState(Math.random());
 
   const play = useCallback(() => {
     audioRef.current.play();
@@ -84,8 +89,11 @@ function App() {
 
   const playTrack = useCallback(
     (trk) => {
+      setRandomNumber(Math.random());
       setTrack(trk);
-      setCurrentIndex(0.0);
+      setIsLoading(true);
+      audioRef.current.currentTime = 0;
+      setCurrentTime(0.0);
       translationX.set(0);
       translationY.set(0);
       setCurrentIndex(-1);
@@ -94,9 +102,18 @@ function App() {
     [translationX, translationY]
   );
 
+  useEffect(() => {
+    audioRef.current.load();
+  }, [track]);
+
   const pause = useCallback(() => {
     audioRef.current.pause();
   }, []);
+
+  const next = useCallback(() => {
+    setRandomNumber(Math.random());
+    playTrack(tracks[Math.floor(Math.random() * tracks.length)]);
+  }, [playTrack]);
 
   const audioRef = useRef(null);
   return (
@@ -112,6 +129,9 @@ function App() {
         onTimeUpdate={(e) => {
           setCurrentTime(e.target.currentTime);
         }}
+        onCanPlayThrough={() => {
+          setIsLoading(false);
+        }}
         onCanPlay={() => {
           if (isPlaying) {
             play();
@@ -125,14 +145,10 @@ function App() {
         }}
         onEnded={() => {
           setIsPlaying(false);
-          playTrack(
-            tracks.filter((trk) => trk.name !== track.name)[
-              Math.floor(Math.random() * tracks.length - 1)
-            ]
-          );
+          next();
         }}
       ></audio>
-      <div className="w-screen h-screen bg-black/90 backdrop-blur-xl fixed top-0 left-0"></div>
+      <div className="w-screen h-screen bg-black/95 backdrop-blur-xl fixed top-0 left-0"></div>
       <motion.div className="w-screen h-screen text-white fixed top-0 left-0 z-10">
         <div className="flex flex-row gap-20 items-center justify-between p-10 md:px-20 relative z-[9999]">
           <div>
@@ -247,12 +263,21 @@ function App() {
               <div className="text-xs">{track.artiste}</div>
             </div>
           </div>
-          <div>
-            {isPlaying ? (
+          <div className="flex flex-row gap-5">
+            {loading ? (
+              <Spinner
+                className="animate-spin"
+                color="white"
+                weight="fill"
+                size={30}
+                onClick={pause}
+              />
+            ) : isPlaying ? (
               <Pause color="white" weight="fill" size={30} onClick={pause} />
             ) : (
               <Play color="white" weight="fill" size={30} onClick={play} />
             )}
+            <SkipForward color="white" weight="fill" size={30} onClick={next} />
           </div>
         </div>
         <motion.div
@@ -273,7 +298,7 @@ function App() {
           {track.lyrics.map((line, key) => {
             return (
               <Line
-                key={key}
+                key={key + line.time + line.line + randomNumber}
                 line={line}
                 i={key}
                 currentTime={currentTime}
